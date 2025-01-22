@@ -1,0 +1,8 @@
+echo "uploads/" >> .gitignore
+echo "images/" >> .gitignore
+echo "*.log" >> .gitignore
+echo "*.zip" >> .gitignore
+echo "*.mp4" >> .gitignore
+echo "*.psd" >> .gitignore
+echo "node_modules/" >> .gitignore
+echo "vendor/" >> .gitignore  # If using Composer dependencies
