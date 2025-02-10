@@ -6,25 +6,167 @@
     <title>E-commerce Site</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .top-bar {
+            background: #000;
+            color: white;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .navbar {
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #000 !important;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #333 !important;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #007bff !important;
+        }
+
+        .search-form {
+            position: relative;
+            margin-right: 15px;
+        }
+
+        .search-form input {
+            border-radius: 20px;
+            padding: 8px 20px;
+            border: 1px solid #ddd;
+            width: 250px;
+        }
+
+        .search-form button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #666;
+        }
+
+        .header-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-icon {
+            color: #333;
+            font-size: 1.2rem;
+            position: relative;
+            text-decoration: none;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+        }
+
+        @media (max-width: 991px) {
+            .search-form {
+                margin: 15px 0;
+            }
+            
+            .search-form input {
+                width: 100%;
+            }
+
+            .header-icons {
+                margin-top: 15px;
+                justify-content: center;
+            }
+        }
+
+        
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="index.php">E-commerce</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <!-- Top Bar -->
+    <div class="top-bar text-center">
+        <div class="container">
+            Free shipping on orders over $50 | Shop Now!
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+        <a class="navbar-brand" href="index.php">
+    <img src="images/dione_logo.png" alt="Brand Name" style="width: 120px; height: auto;">
+</a>
+    
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="cart.php">Cart</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about.php">About us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="products.php">Products</a></li>
-
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="products.php">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="new-arrivals.php">New Arrivals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sale.php">Sale</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.php">About</a>
+                    </li>
                 </ul>
+                
+                <form class="search-form d-flex">
+                    <input class="form-control" type="search" placeholder="Search products..." aria-label="Search">
+                    <button type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                
+                <div class="header-icons">
+                    <a href="login.php" class="header-icon">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <a href="wishlist.php" class="header-icon">
+                        <i class="fas fa-heart"></i>
+                    </a>
+                    <a href="cart.php" class="header-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

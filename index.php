@@ -1,84 +1,243 @@
 <?php include 'header.php'; ?>
 <?php include 'config.php'; ?>
 
-<div class="container mt-4">
-    <!-- Bootstrap Carousel -->
-    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
-        <!-- Indicators -->
+<!-- Hero Section with Carousel -->
+<div class="container-fluid p-0">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
-            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
         </div>
 
-        <!-- Carousel Items -->
         <div class="carousel-inner">
             <div class="carousel-item active">
                 <img src="images/slide1.jpg" class="d-block w-100" alt="Slide 1">
-                <div class="carousel-caption d-none d-md-block">
-                    <h5>Shop the Latest Trends</h5>
-                    <p>Discover new arrivals and exclusive collections.</p>
+                <div class="carousel-caption">
+                    <h1 class="display-4 fw-bold">New Season Arrivals</h1>
+                    <p class="lead">Check out our latest collection for this season</p>
+                    <a href="products.php" class="btn btn-light btn-lg">Shop Now</a>
                 </div>
             </div>
             <div class="carousel-item">
                 <img src="images/slide2.jpg" class="d-block w-100" alt="Slide 2">
-                <div class="carousel-caption d-none d-md-block">
-                    <h5>Exclusive Offers</h5>
-                    <p>Don't miss out on our limited-time discounts.</p>
+                <div class="carousel-caption">
+                    <h1 class="display-4 fw-bold">Special Offers</h1>
+                    <p class="lead">Up to 50% off on selected items</p>
+                    <a href="sales.php" class="btn btn-light btn-lg">View Offers</a>
                 </div>
             </div>
             <div class="carousel-item">
                 <img src="images/slide3.jpg" class="d-block w-100" alt="Slide 3">
-                <div class="carousel-caption d-none d-md-block">
-                    <h5>Fast & Secure Checkout</h5>
-                    <p>Shop with confidence and ease.</p>
+                <div class="carousel-caption">
+                    <h1 class="display-4 fw-bold">Premium Quality</h1>
+                    <p class="lead">Discover our premium collection</p>
+                    <a href="premium.php" class="btn btn-light btn-lg">Explore</a>
                 </div>
             </div>
         </div>
 
-        <!-- Controls -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
         </button>
     </div>
 </div>
 
-<!-- Newly Added Products Section -->
-<div class="container mt-5">
-    <h2 class="text-center">New Arrivals</h2>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+<!-- Features Section -->
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="text-center p-3">
+                <i class="bi bi-truck fs-1"></i>
+                <h5 class="mt-3">Free Shipping</h5>
+                <p class="text-muted">On orders over $100</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center p-3">
+                <i class="bi bi-shield-check fs-1"></i>
+                <h5 class="mt-3">Secure Payment</h5>
+                <p class="text-muted">100% secure payment</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center p-3">
+                <i class="bi bi-arrow-counterclockwise fs-1"></i>
+                <h5 class="mt-3">Easy Returns</h5>
+                <p class="text-muted">14 day return policy</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center p-3">
+                <i class="bi bi-headset fs-1"></i>
+                <h5 class="mt-3">24/7 Support</h5>
+                <p class="text-muted">Dedicated support</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Latest Products Section -->
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Latest Products</h2>
+        <a href="products.php" class="btn btn-outline-dark">View All</a>
+    </div>
+    
+    <div class="row g-4">
         <?php
-        // Fetch the latest 6 products
-        $latest_products_query = "SELECT * FROM products WHERE active = 1 ORDER BY id DESC LIMIT 6";
-        $latest_products_result = mysqli_query($conn, $latest_products_query);
-
-        while ($product = mysqli_fetch_assoc($latest_products_result)): ?>
-            <div class="col">
-                <div class="card h-100 product-card">
-                    <img src="uploads/<?php echo htmlspecialchars($product['image1']); ?>" 
-                         class="card-img-top product-image" 
-                         alt="<?php echo htmlspecialchars($product['title']); ?>">
-
+        // Fetch latest 9 products with their images
+        $sql = "SELECT p.*, 
+                GROUP_CONCAT(pi.image_url) as product_images 
+                FROM products p 
+                LEFT JOIN product_images pi ON p.id = pi.product_id 
+                WHERE p.active = 1 
+                GROUP BY p.id 
+                ORDER BY p.created_at DESC 
+                LIMIT 9";
+        
+        $result = mysqli_query($conn, $sql);
+        
+        while ($product = mysqli_fetch_assoc($result)):
+            // Get first image from the concatenated image URLs
+            $images = explode(',', $product['product_images']);
+            $first_image = !empty($images[0]) ? $images[0] : 'default-product.jpg';
+        ?>
+            <div class="col-md-4">
+                <div class="card h-100 product-card border-0 shadow-sm">
+                    <div class="position-relative">
+                        <a href="product-details.php?id=<?php echo $product['id']; ?>">
+                            <img src="uploads/<?php echo htmlspecialchars($first_image); ?>" 
+                                 class="card-img-top product-image" 
+                                 alt="<?php echo htmlspecialchars($product['title']); ?>"
+                                 style="height: 300px; object-fit: cover;">
+                        </a>
+                        <?php if ($product['stock_quantity'] <= 0): ?>
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-danger">Out of Stock</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    
                     <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($product['title']); ?></h5>
-                        <p class="card-text"><strong>Price: $<?php echo number_format($product['price'], 2); ?></strong></p>
-                        <form action="products.php" method="POST" class="d-flex gap-2">
-                            <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                            <input type="number" name="quantity" value="1" min="1" max="10" class="form-control form-control-sm w-25">
-                            <button type="submit" name="add_to_cart" class="btn btn-primary">
-                                <i class="bi bi-cart-plus"></i> Add to Cart
-                            </button>
-                        </form>
+                        <h5 class="card-title">
+                            <a href="product-details.php?id=<?php echo $product['id']; ?>" 
+                               class="text-decoration-none text-dark">
+                                <?php echo htmlspecialchars($product['title']); ?>
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted">
+                            <?php echo substr(htmlspecialchars($product['description']), 0, 100) . '...'; ?>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">$<?php echo number_format($product['price'], 2); ?></h5>
+                            <?php if ($product['stock_quantity'] > 0): ?>
+                                <form action="cart.php" method="POST" class="d-flex gap-2">
+                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" name="add_to_cart" class="btn btn-primary">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </form>
+                            <?php else: ?>
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="bi bi-cart-x"></i>
+                                </button>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
         <?php endwhile; ?>
     </div>
 </div>
+
+<!-- Categories Section -->
+<div class="container my-5">
+    <h2 class="fw-bold mb-4">Shop by Category</h2>
+    <div class="row g-4">
+        <?php
+        $categories_query = "SELECT DISTINCT category FROM products WHERE active = 1 LIMIT 4";
+        $categories_result = mysqli_query($conn, $categories_query);
+        while ($category = mysqli_fetch_assoc($categories_result)):
+        ?>
+            <div class="col-md-3">
+                <a href="products.php?category=<?php echo urlencode($category['category']); ?>" 
+                   class="text-decoration-none">
+                    <div class="card category-card border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <h5 class="card-title text-dark mb-0">
+                                <?php echo htmlspecialchars($category['category']); ?>
+                            </h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        <?php endwhile; ?>
+    </div>
+</div>
+
+<!-- Newsletter Section -->
+<div class="container-fluid bg-light py-5 my-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <h3 class="fw-bold">Subscribe to Our Newsletter</h3>
+                <p class="text-muted">Stay updated with our latest products and offers</p>
+                <form class="d-flex gap-2">
+                    <input type="email" class="form-control" placeholder="Enter your email">
+                    <button type="submit" class="btn btn-dark">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.carousel-item img {
+    height: 70vh;
+    object-fit: cover;
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.product-card {
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.category-card {
+    transition: transform 0.3s ease;
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+    .carousel-item img {
+        height: 50vh;
+    }
+    
+    .carousel-caption {
+        padding: 1rem;
+    }
+    
+    .carousel-caption h1 {
+        font-size: 1.5rem;
+    }
+}
+</style>
 
 <?php include 'footer.php'; ?>

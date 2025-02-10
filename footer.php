@@ -1,67 +1,71 @@
-<footer class="bg-light text-center text-lg-start mt-4">
-    <!-- Footer Container -->
-    <div class="container p-4">
-        <!-- Social Media Links -->
-        <section class="mb-4">
-            <a class="btn btn-outline-primary btn-floating m-1" href="https://www.facebook.com" role="button">
-                <i class="fab fa-facebook-f"></i> Facebook
-            </a>
-            <a class="btn btn-outline-primary btn-floating m-1" href="https://www.twitter.com" role="button">
-                <i class="fab fa-twitter"></i> Twitter
-            </a>
-            <a class="btn btn-outline-primary btn-floating m-1" href="https://www.instagram.com" role="button">
-                <i class="fab fa-instagram"></i> Instagram
-            </a>
-            <a class="btn btn-outline-primary btn-floating m-1" href="https://www.linkedin.com" role="button">
-                <i class="fab fa-linkedin"></i> LinkedIn
-            </a>
-        </section>
-
-        <!-- Footer Links -->
-        <section class="">
-            <div class="row">
-                <!-- About Section -->
-                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
-                    <h5 class="text-uppercase">About Us</h5>
-                    <p>
-                        Welcome to our e-commerce store! We offer a wide variety of products at the best prices. Shop with confidence.
-                    </p>
-                </div>
-
-                <!-- Quick Links -->
-                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
-                    <h5 class="text-uppercase">Quick Links</h5>
-                    <ul class="list-unstyled mb-0">
-                        <li><a href="index.php" class="text-dark">Home</a></li>
-                        <li><a href="cart.php" class="text-dark">Cart</a></li>
-                        <li><a href="login.php" class="text-dark">Login</a></li>
-                        <li><a href="register.php" class="text-dark">Register</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact Info -->
-                <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
-                    <h5 class="text-uppercase">Contact Us</h5>
-                    <p>
-                        Email: support@example.com<br>
-                        Phone: +123 456 7890<br>
-                        Address: 123 Main Street, City, Country
-                    </p>
-                </div>
+<footer class="bg-light pt-5 pb-4">
+    <div class="container">
+        <div class="row">
+            <!-- Newsletter Subscription -->
+            <div class="col-md-4">
+                <h5 class="fw-bold">BE THE FIRST TO KNOW</h5>
+                <form action="subscribe.php" method="POST" class="d-flex">
+                    <input type="email" name="email" class="form-control" placeholder="Enter your email address..." required>
+                    <button type="submit" class="btn btn-dark ms-2">Sign Up</button>
+                </form>
             </div>
-        </section>
+
+            <!-- Customer Service Links -->
+            <div class="col-md-3 mt-4 mt-md-0">
+                <h5 class="fw-bold">CUSTOMER SERVICE</h5>
+                <ul class="list-unstyled">
+                    <li><a href="contact.php" class="text-dark text-decoration-none">Contact Us</a></li>
+                    <li><a href="delivery.php" class="text-dark text-decoration-none">Delivery</a></li>
+                    <li><a href="returns.php" class="text-dark text-decoration-none">Returns and Exchanges</a></li>
+                    <li><a href="size-guide.php" class="text-dark text-decoration-none">Size Guide</a></li>
+                    <li><a href="privacy.php" class="text-dark text-decoration-none">Privacy Policy</a></li>
+                    <li><a href="shipping.php" class="text-dark text-decoration-none">International Shipping</a></li>
+                    <li><a href="feedback.php" class="text-dark text-decoration-none">Fashionable Feedback</a></li>
+                </ul>
+            </div>
+
+            <!-- Discover Section -->
+            <div class="col-md-2 mt-4 mt-md-0">
+                <h5 class="fw-bold">DISCOVER</h5>
+                <ul class="list-unstyled">
+                    <li><a href="about.php" class="text-dark text-decoration-none">The Company</a></li>
+                </ul>
+            </div>
+
+            <!-- Follow Us on Social Media -->
+            <div class="col-md-3 mt-4 mt-md-0 text-md-end">
+                <h5 class="fw-bold">FOLLOW US ON</h5>
+                <a href="#" class="btn btn-dark btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="btn btn-dark btn-sm rounded-circle"><i class="bi bi-pinterest"></i></a>
+                <a href="#" class="btn btn-dark btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="btn btn-dark btn-sm rounded-circle"><i class="bi bi-envelope"></i></a>
+            </div>
+        </div>
     </div>
 
-    <!-- Copyright -->
-    <div class="text-center p-3 bg-dark text-white">
-        © 2025 E-commerce Site. All rights reserved.
-        <br>
-        <a href="terms.php" class="text-white">Terms & Conditions</a> | <a href="privacy.php" class="text-white">Privacy Policy</a>
+    <!-- Floating Social Media & Rewards Section -->
+    <div class="position-fixed bottom-0 start-0 m-3">
+        <div class="d-flex flex-column align-items-start">
+        <img width="48" height="48" src="https://img.icons8.com/color/48/facebook-new.png" alt="facebook-new"/>            <a href="#" class="mb-2"><img width="48" height="48" src="https://img.icons8.com/fluency/48/instagram-new.png" alt="instagram-new"/></a>
+            <a href="#"><img width="48" height="48" src="https://img.icons8.com/color/48/tiktok--v1.png" alt="tiktok--v1"/></a>
+        </div>
     </div>
 
-    <!-- FontAwesome Icons (Optional for Social Media) -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- Floating Chat Button -->
+    <div class="position-fixed bottom-0 end-0 m-3">
+        <a href="#" class="btn btn-dark rounded-pill p-3">
+            <i class="bi bi-chat"></i> Chat
+            <span class="badge bg-danger ms-2">1</span>
+        </a>
+    </div>
 
-    <!-- Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer Bottom Section -->
+    <div class="text-center p-3 mt-3 bg-dark text-white">
+        © <?php echo date('Y'); ?> E-commerce Site. All rights reserved.
+        <a href="terms.php" class="text-white text-decoration-none ms-3">Terms & Conditions</a> |
+        <a href="privacy.php" class="text-white text-decoration-none">Privacy Policy</a>
+    </div>
 </footer>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
