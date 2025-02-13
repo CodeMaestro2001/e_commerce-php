@@ -2,141 +2,55 @@
 include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT); // Hash password
-    $role = 'user'; // Default role
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
 
-    // Check if username or email already exists
-    $checkUser = "SELECT * FROM users WHERE username='$username' OR email='$email'";
-    $result = $conn->query($checkUser);
+    // Validate password strength (at least 8 chars, 1 uppercase, 1 number)
+    if (!preg_match("/^(?=.*[A-Z])(?=.*\d).{8,}$/", $password)) {
+        $error = "Password must be at least 8 characters long, contain an uppercase letter, and a number.";
+    }
+    
+    else {
+        // Hash the password
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-    if ($result->num_rows > 0) {
-        $error = "Username or Email already exists!";
-    } else {
-        // Insert user into database
-        $sql = "INSERT INTO users (username, email, password, role, active) VALUES ('$username', '$email', '$password', '$role', 1)";
-        if ($conn->query($sql)) {
-            header("Location: login.php"); // Redirect to login page
-            exit();
+        // Check if username or email already exists
+        $checkUserQuery = "SELECT id FROM users WHERE username = ? OR email = ?";
+        $stmt = $conn->prepare($checkUserQuery);
+        $stmt->bind_param("ss", $username, $email);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $error = "Username or Email already exists!";
         } else {
-            $error = "Error: " . $conn->error;
+            // Insert new user
+            $insertQuery = "INSERT INTO users (username, email, password, role, active) VALUES (?, ?, ?, 'user', 1)";
+            $stmt = $conn->prepare($insertQuery);
+            $stmt->bind_param("sss", $username, $email, $hashed_password);
+            if ($stmt->execute()) {
+                $success = "Account created successfully! Redirecting to login...";
+                echo "<script>
+                        setTimeout(function() {
+                            window.location.href = 'login.php';
+                        }, 2000);
+                      </script>";
+            } else {
+                $error = "Error: " . $conn->error;
+            }
         }
+        $stmt->close();
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <?php include 'header.php'; ?>
     <title>Register - Dione Fashion</title>
-    <style>
-        .register-container {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 40px 20px;
-        }
-
-        .register-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .register-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .register-header h2 {
-            color: #333;
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .register-header p {
-            color: #666;
-            font-size: 1.1rem;
-        }
-
-        .form-floating {
-            margin-bottom: 20px;
-        }
-
-        .form-floating input {
-            border-radius: 10px;
-            padding: 15px;
-            height: 60px;
-            border: 2px solid #e1e1e1;
-            transition: all 0.3s ease;
-        }
-
-        .form-floating input:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
-        }
-
-        .form-floating label {
-            padding: 20px;
-        }
-
-        .register-btn {
-            width: 100%;
-            padding: 15px;
-            border-radius: 10px;
-            background: #007bff;
-            border: none;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .register-btn:hover {
-            background: #0056b3;
-            transform: translateY(-2px);
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-        }
-
-        .login-link a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .alert {
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: none;
-        }
-
-        .password-requirements {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-            padding-left: 15px;
-        }
-
-        .form-icon {
-            color: #007bff;
-            font-size: 1.2rem;
-            margin-right: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css"> <!-- External CSS -->
 </head>
 <body>
 <div class="register-container">
@@ -148,35 +62,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         <?php if (isset($error)): ?>
             <div class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-circle form-icon"></i>
-                <?php echo $error; ?>
+                <i class="fas fa-exclamation-circle"></i> <?php echo $error; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($success)): ?>
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle"></i> <?php echo $success; ?>
             </div>
         <?php endif; ?>
 
         <form method="POST" action="" class="needs-validation" novalidate>
             <div class="form-floating">
                 <input type="text" name="username" id="username" class="form-control" placeholder="Username" required>
-                <label for="username"><i class="fas fa-user form-icon"></i>Username</label>
+                <label for="username"><i class="fas fa-user"></i> Username</label>
                 <div class="invalid-feedback">Please choose a username.</div>
             </div>
 
             <div class="form-floating">
                 <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>
-                <label for="email"><i class="fas fa-envelope form-icon"></i>Email address</label>
+                <label for="email"><i class="fas fa-envelope"></i> Email address</label>
                 <div class="invalid-feedback">Please enter a valid email address.</div>
             </div>
 
             <div class="form-floating">
                 <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
-                <label for="password"><i class="fas fa-lock form-icon"></i>Password</label>
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
                 <div class="password-requirements">
-                    Password must contain at least 8 characters, including uppercase, lowercase letters and numbers
+                    Password must contain at least 8 characters, including uppercase and numbers.
                 </div>
             </div>
 
-            <button type="submit" class="register-btn">
-                Create Account
-            </button>
+            <button type="submit" class="register-btn">Create Account</button>
 
             <div class="login-link">
                 Already have an account? <a href="login.php">Sign in</a>
@@ -189,17 +106,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Form validation
     (function () {
         'use strict'
-        const forms = document.querySelectorAll('.needs-validation')
+        const forms = document.querySelectorAll('.needs-validation');
         Array.from(forms).forEach(form => {
             form.addEventListener('submit', event => { 
                 if (!form.checkValidity()) {
-                    event.preventDefault()
-                    event.stopPropagation()
+                    event.preventDefault();
+                    event.stopPropagation();
                 }
-                form.classList.add('was-validated')
-            }, false)
-        })
-    })()
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
 </script>
 
 <?php include 'footer.php'; ?>
