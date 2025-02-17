@@ -13,25 +13,25 @@
         .top-bar {
             background: #000;
             color: white;
-            padding: 8px 0;
-            font-size: 0.9rem;
+            padding: 5px 0;
+            font-size: 0.85rem;
         }
 
         .navbar {
-            padding: 20px 0;
+            padding: 10px 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .navbar-brand {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #000 !important;
+        .navbar-brand img {
+            width: 100px;
+            height: auto;
         }
 
         .nav-link {
             font-weight: 500;
             color: #333 !important;
-            margin: 0 10px;
+            margin: 0 8px;
+            font-size: 0.95rem;
             transition: color 0.3s ease;
         }
 
@@ -41,19 +41,20 @@
 
         .search-form {
             position: relative;
-            margin-right: 15px;
+            margin-right: 10px;
         }
 
         .search-form input {
-            border-radius: 20px;
-            padding: 8px 20px;
+            border-radius: 15px;
+            padding: 6px 15px;
             border: 1px solid #ddd;
-            width: 250px;
+            width: 220px;
+            font-size: 0.9rem;
         }
 
         .search-form button {
             position: absolute;
-            right: 10px;
+            right: 8px;
             top: 50%;
             transform: translateY(-50%);
             border: none;
@@ -64,30 +65,30 @@
         .header-icons {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .header-icon {
             color: #333;
-            font-size: 1.2rem;
+            font-size: 1rem;
             position: relative;
             text-decoration: none;
         }
 
         .cart-count {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -6px;
+            right: -6px;
             background: #ff4444;
             color: white;
             border-radius: 50%;
-            padding: 2px 6px;
+            padding: 2px 5px;
             font-size: 0.7rem;
         }
 
         @media (max-width: 991px) {
             .search-form {
-                margin: 15px 0;
+                margin: 10px 0;
             }
             
             .search-form input {
@@ -95,12 +96,10 @@
             }
 
             .header-icons {
-                margin-top: 15px;
+                margin-top: 10px;
                 justify-content: center;
             }
         }
-
-        
     </style>
 </head>
 <body>
@@ -114,9 +113,9 @@
     <!-- Main Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container">
-        <a class="navbar-brand" href="index.php">
-    <img src="images/dione_logo.png" alt="Brand Name" style="width: 120px; height: auto;">
-</a>
+            <a class="navbar-brand" href="index.php">
+                <img src="images/image.png" alt="Brand Name">
+            </a>
     
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

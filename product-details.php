@@ -2,14 +2,22 @@
 include 'header.php';
 include 'config.php';
 
+// Simple category map
+$category_map = [
+    1 => 'Mens Wear',
+    2 => 'Ladies Wear',
+    3 => 'Kids Wear',
+    4 => 'Intimate Apparel'
+];
+
 // Get product ID from URL
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Fetch product details
-$sql = "SELECT p.*, GROUP_CONCAT(pi.image_url) as product_images 
-        FROM products p 
-        LEFT JOIN product_images pi ON p.id = pi.product_id 
-        WHERE p.id = ? AND p.active = 1 
+// Fetch product details (with category_id)
+$sql = "SELECT p.*, GROUP_CONCAT(pi.image_url) AS product_images
+        FROM products p
+        LEFT JOIN product_images pi ON p.id = pi.product_id
+        WHERE p.id = ? AND p.active = 1
         GROUP BY p.id";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $product_id);
@@ -22,20 +30,37 @@ if (!$product) {
     exit();
 }
 
+// Convert category_id to human-readable name
+$category_id = (int)$product['category_id'];
+$category_name = isset($category_map[$category_id]) ? $category_map[$category_id] : 'Uncategorized';
+
 // Get product images array
 $product_images = explode(',', $product['product_images']);
 
-// Fetch related products
-$sql = "SELECT p.*, pi.image_url 
-        FROM products p 
-        LEFT JOIN product_images pi ON p.id = pi.product_id 
-        WHERE p.category = ? AND p.id != ? AND p.active = 1 
-        GROUP BY p.id 
+// Fetch related products by category_id, excluding current product
+$sql = "SELECT p.*, pi.image_url
+        FROM products p
+        LEFT JOIN product_images pi ON p.id = pi.product_id
+        WHERE p.category_id = ? 
+          AND p.id != ? 
+          AND p.active = 1
+        GROUP BY p.id
         LIMIT 4";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "si", $product['category'], $product_id);
+mysqli_stmt_bind_param($stmt, "ii", $category_id, $product_id);
 mysqli_stmt_execute($stmt);
 $related_products = mysqli_stmt_get_result($stmt);
+
+// Prepare WhatsApp share link (URL-encoded message)
+$whatsapp_message = urlencode(
+    "Check out this product: " 
+    . $product['title'] 
+    . " for ₹" 
+    . number_format($product['price'], 2) 
+    . "!\n\nBuy here: https://yourdomain.com/product-details.php?id=" 
+    . $product['id']
+);
+$whatsapp_share_url = "https://api.whatsapp.com/send?text={$whatsapp_message}";
 ?>
 
 <div class="container mt-5 mb-5">
@@ -69,10 +94,13 @@ $related_products = mysqli_stmt_get_result($stmt);
         <div class="col-md-6">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                     <li class="breadcrumb-item">
-                        <a href="products.php?category=<?php echo urlencode($product['category']); ?>">
-                            <?php echo htmlspecialchars($product['category']); ?>
+                        <a href="index.php">Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <!-- Link to products page filtered by category_id -->
+                        <a href="products.php?category_id=<?php echo urlencode($category_id); ?>">
+                            <?php echo htmlspecialchars($category_name); ?>
                         </a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">
@@ -81,9 +109,11 @@ $related_products = mysqli_stmt_get_result($stmt);
                 </ol>
             </nav>
 
-            <h1 class="product-title mb-3"><?php echo htmlspecialchars($product['title']); ?></h1>
+            <h1 class="product-title mb-3">
+                <?php echo htmlspecialchars($product['title']); ?>
+            </h1>
             
-            <!-- Reviews -->
+            <!-- Reviews (Static) -->
             <div class="mb-3">
                 <div class="ratings">
                     <i class="bi bi-star"></i>
@@ -103,7 +133,7 @@ $related_products = mysqli_stmt_get_result($stmt);
                 <?php endif; ?>
             </div>
 
-            <!-- Size Selection -->
+            <!-- Size Selection (Static Example) -->
             <div class="mb-4">
                 <label class="form-label">Select Size</label>
                 <div class="d-flex gap-2">
@@ -123,7 +153,12 @@ $related_products = mysqli_stmt_get_result($stmt);
                         <label class="form-label">Quantity</label>
                         <div class="input-group" style="width: 130px;">
                             <button type="button" class="btn btn-outline-secondary" onclick="decrementQuantity()">-</button>
-                            <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="<?php echo $product['stock_quantity']; ?>" id="quantityInput">
+                            <input type="number" class="form-control text-center" 
+                                   name="quantity" 
+                                   value="1" 
+                                   min="1" 
+                                   max="<?php echo $product['stock_quantity']; ?>" 
+                                   id="quantityInput">
                             <button type="button" class="btn btn-outline-secondary" onclick="incrementQuantity()">+</button>
                         </div>
                     </div>
@@ -138,6 +173,15 @@ $related_products = mysqli_stmt_get_result($stmt);
                     <i class="bi bi-heart"></i> Add to Wishlist
                 </button>
             </form>
+
+            <!-- WhatsApp Share Button -->
+            <div class="mb-4">
+                <a href="<?php echo $whatsapp_share_url; ?>" 
+                   target="_blank" 
+                   class="btn btn-success btn-lg">
+                    <i class="bi bi-whatsapp"></i> Share on WhatsApp
+                </a>
+            </div>
 
             <!-- Product Description -->
             <div class="product-description mt-4">
@@ -155,7 +199,11 @@ $related_products = mysqli_stmt_get_result($stmt);
                 <div class="col">
                     <div class="card h-100 border-0 product-card">
                         <a href="product-details.php?id=<?php echo $related['id']; ?>" class="text-decoration-none">
-                            <img src="uploads/<?php echo htmlspecialchars($related['image_url']); ?>" 
+                            <?php 
+                            // If no image_url, fallback to a default
+                            $rel_image = $related['image_url'] ?: 'default-product.jpg';
+                            ?>
+                            <img src="uploads/<?php echo htmlspecialchars($rel_image); ?>" 
                                  class="card-img-top" 
                                  alt="<?php echo htmlspecialchars($related['title']); ?>">
                             <div class="card-body">

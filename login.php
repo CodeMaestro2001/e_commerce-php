@@ -81,9 +81,7 @@ $conn->close();
         <div class="login-header">
             <img src="images/dione_logo.png" alt="DIONE Logo">
             <h2>Welcome Back</h2>
-            <?php
-            echo 
-            ?>
+            
             <p>Please log in to your account</p>
         </div>
 

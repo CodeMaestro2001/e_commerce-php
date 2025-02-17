@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Dione - Modern Fashion Brand</title>
     <style>
+        /* Reset default margin and padding */
         * {
             margin: 0;
             padding: 0;
@@ -12,37 +13,67 @@
             font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
+        body {
+            margin: 0;
+            padding: 0;
         }
 
+        /* Header styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            z-index: 1000;
+            height: 60px;
+            line-height: 60px;
+        }
+
+        /* Navbar specific styles */
+        nav.navbar {
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Hero section adjustment */
         .hero {
             background-color: #f8f8f8;
-            padding: 4rem 0;
+            padding: 2rem 0;
+            margin-top: 60px; /* Match header height */
             text-align: center;
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 2.2rem;
             color: #333;
-            margin-bottom: 1.5rem;
+            margin: 0;
+            padding: 0;
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #666;
             max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
+            margin: 5px auto 0 auto;
+            line-height: 1.5;
         }
 
+        /* Container adjustments */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Rest of your existing styles */
         .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            margin: 4rem 0;
+            gap: 2.5rem;
+            margin: 2rem 0;
             align-items: center;
         }
 
@@ -54,27 +85,27 @@
         }
 
         .about-content h2 {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             color: #333;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .about-content p {
             color: #666;
-            line-height: 1.8;
-            margin-bottom: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0.8rem;
         }
 
         .features {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin: 4rem 0;
+            gap: 1.5rem;
+            margin: 3rem 0;
             text-align: center;
         }
 
         .feature-card {
-            padding: 2rem;
+            padding: 1.2rem;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
@@ -86,7 +117,7 @@
         }
 
         .feature-icon {
-            font-size: 2rem;
+            font-size: 1.5rem;
             margin-bottom: 1rem;
             color: #333;
         }
@@ -139,7 +170,6 @@
 <body>
     <?php include 'header.php'; ?>
 
-
     <section class="hero">
         <div class="container">
             <h1>OUR BRAND</h1>
@@ -148,6 +178,7 @@
     </section>
 
     <div class="container">
+        <!-- Rest of your content remains the same -->
         <div class="about-grid">
             <img src="images/about_image.jpg" alt="Fashion Model" class="about-image">
             <div class="about-content">
@@ -176,6 +207,7 @@
             </div>
         </div>
     </div>
+
     <?php include 'footer.php'; ?>
 </body>
 </html>

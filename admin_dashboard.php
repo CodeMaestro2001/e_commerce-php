@@ -1,6 +1,15 @@
 <?php
 session_start();
 
+require_once 'main_functions.php';
+$auth = new Auth($conn);
+$auth->checkPermission($_SERVER['PHP_SELF']);
+
+// Restrict access to only admins
+if (!$auth->isAdmin()) {
+    die("Access Denied. Admins only.");
+}
+
 // Check if the user is logged in
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     header("Location: index.php");

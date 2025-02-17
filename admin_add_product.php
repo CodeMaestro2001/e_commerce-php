@@ -46,23 +46,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $description = mysqli_real_escape_string($conn, $_POST['description']);
     $price = floatval($_POST['price']);
     $stock_quantity = intval($_POST['stock_quantity']);
-    $category = mysqli_real_escape_string($conn, $_POST['category']);
+
+    // Grab the new category_id (1 = Mens, 2 = Ladies, etc.)
+    $category_id = intval($_POST['category_id']);
+
     $size = mysqli_real_escape_string($conn, $_POST['size']);
     
     if (isset($_POST['edit_id'])) {
         // Update existing product
         $edit_id = mysqli_real_escape_string($conn, $_POST['edit_id']);
-        $sql = "UPDATE products SET title = ?, description = ?, price = ?, stock_quantity = ?, category = ?, size = ? WHERE id = ?";
+        $sql = "UPDATE products 
+                SET title = ?, description = ?, price = ?, stock_quantity = ?, category_id = ?, size = ?, updated_at = NOW() 
+                WHERE id = ?";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sssissi", $title, $description, $price, $stock_quantity, $category, $size, $edit_id);
+        mysqli_stmt_bind_param($stmt, "ssdissi", $title, $description, $price, $stock_quantity, $category_id, $size, $edit_id);
         mysqli_stmt_execute($stmt);
         $product_id = $edit_id;
     } else {
         // Insert new product
-        $sql = "INSERT INTO products (title, description, price, stock_quantity, category, size, active, created_at, updated_at) 
+        $sql = "INSERT INTO products (title, description, price, stock_quantity, category_id, size, active, created_at, updated_at) 
                 VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW())";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssdsss", $title, $description, $price, $stock_quantity, $category, $size);
+        mysqli_stmt_bind_param($stmt, "ssdiss", $title, $description, $price, $stock_quantity, $category_id, $size);
         mysqli_stmt_execute($stmt);
         $product_id = mysqli_insert_id($conn);
     }
@@ -71,13 +76,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!empty($_FILES['images']['name'][0])) {
         foreach ($_FILES['images']['name'] as $key => $value) {
             if ($_FILES['images']['error'][$key] === 0) {
-                $file = array(
-                    'name' => $_FILES['images']['name'][$key],
-                    'type' => $_FILES['images']['type'][$key],
+                $file = [
+                    'name'     => $_FILES['images']['name'][$key],
+                    'type'     => $_FILES['images']['type'][$key],
                     'tmp_name' => $_FILES['images']['tmp_name'][$key],
-                    'error' => $_FILES['images']['error'][$key],
-                    'size' => $_FILES['images']['size'][$key]
-                );
+                    'error'    => $_FILES['images']['error'][$key],
+                    'size'     => $_FILES['images']['size'][$key]
+                ];
                 
                 $image_name = handleImageUpload($file);
                 if ($image_name) {
@@ -96,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Function to get product images
 function getProductImages($conn, $product_id) {
-    $images = array();
+    $images = [];
     $sql = "SELECT * FROM product_images WHERE product_id = ?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "i", $product_id);
@@ -125,26 +130,39 @@ function getProductImages($conn, $product_id) {
             <label class="form-label">Product Title</label>
             <input type="text" class="form-control" name="title" required>
         </div>
+
         <div class="mb-3">
             <label class="form-label">Description</label>
             <textarea class="form-control" name="description" required></textarea>
         </div>
+
         <div class="mb-3">
             <label class="form-label">Price ($)</label>
             <input type="number" step="0.01" class="form-control" name="price" required>
         </div>
+
         <div class="mb-3">
             <label class="form-label">Stock Quantity</label>
             <input type="number" class="form-control" name="stock_quantity" required>
         </div>
+
+        <!-- Category ID Field (Dropdown) -->
         <div class="mb-3">
             <label class="form-label">Category</label>
-            <input type="text" class="form-control" name="category" required>
+            <select name="category_id" class="form-select" required>
+                <option value="">Select Category</option>
+                <option value="1">Mens Wear</option>
+                <option value="2">Ladies Wear</option>
+                <option value="3">Kids Wear</option>
+                <option value="4">Intimate Apparel</option>
+            </select>
         </div>
+
         <div class="mb-3">
             <label class="form-label">Size</label>
             <input type="text" class="form-control" name="size" required>
         </div>
+
         <div class="mb-3">
             <label class="form-label">Upload Images</label>
             <input type="file" class="form-control" name="images[]" multiple accept="image/*">
@@ -162,7 +180,7 @@ function getProductImages($conn, $product_id) {
                 <th>Title</th>
                 <th>Description</th>
                 <th>Price</th>
-                <th>Category</th>
+                <th>Category ID</th>
                 <th>Size</th>
                 <th>Stock</th>
                 <th>Images</th>
@@ -170,7 +188,7 @@ function getProductImages($conn, $product_id) {
             </tr>
         </thead>
         <tbody>
-        <?php if (mysqli_num_rows($result) > 0): ?>
+        <?php if ($result && mysqli_num_rows($result) > 0): ?>
             <?php while ($row = mysqli_fetch_assoc($result)): 
                 $product_images = getProductImages($conn, $row['id']);
             ?>
@@ -179,7 +197,7 @@ function getProductImages($conn, $product_id) {
                     <td><?php echo htmlspecialchars($row['title']); ?></td>
                     <td><?php echo htmlspecialchars($row['description']); ?></td>
                     <td>$<?php echo number_format($row['price'], 2); ?></td>
-                    <td><?php echo htmlspecialchars($row['category']); ?></td>
+                    <td><?php echo htmlspecialchars($row['category_id']); ?></td>
                     <td><?php echo htmlspecialchars($row['size']); ?></td>
                     <td><?php echo htmlspecialchars($row['stock_quantity']); ?></td>
                     <td>
@@ -188,7 +206,10 @@ function getProductImages($conn, $product_id) {
                         <?php endforeach; ?>
                     </td>
                     <td>
+                        <!-- Edit Button -->
                         <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $row['id']; ?>">Edit</button>
+                        
+                        <!-- Delete Button -->
                         <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $row['id']; ?>">Delete</button>
                     </td>
                 </tr>
@@ -207,7 +228,8 @@ function getProductImages($conn, $product_id) {
                                     
                                     <div class="mb-3">
                                         <label class="form-label">Product Title</label>
-                                        <input type="text" class="form-control" name="title" value="<?php echo htmlspecialchars($row['title']); ?>" required>
+                                        <input type="text" class="form-control" name="title" 
+                                               value="<?php echo htmlspecialchars($row['title']); ?>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Description</label>
@@ -215,19 +237,27 @@ function getProductImages($conn, $product_id) {
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Price ($)</label>
-                                        <input type="number" step="0.01" class="form-control" name="price" value="<?php echo htmlspecialchars($row['price']); ?>" required>
+                                        <input type="number" step="0.01" class="form-control" name="price" 
+                                               value="<?php echo htmlspecialchars($row['price']); ?>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Stock Quantity</label>
-                                        <input type="number" class="form-control" name="stock_quantity" value="<?php echo htmlspecialchars($row['stock_quantity']); ?>" required>
+                                        <input type="number" class="form-control" name="stock_quantity" 
+                                               value="<?php echo htmlspecialchars($row['stock_quantity']); ?>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Category</label>
-                                        <input type="text" class="form-control" name="category" value="<?php echo htmlspecialchars($row['category']); ?>" required>
+                                        <select name="category_id" class="form-select" required>
+                                            <option value="1" <?php if($row['category_id'] == 1) echo 'selected'; ?>>Mens Wear</option>
+                                            <option value="2" <?php if($row['category_id'] == 2) echo 'selected'; ?>>Ladies Wear</option>
+                                            <option value="3" <?php if($row['category_id'] == 3) echo 'selected'; ?>>Kids Wear</option>
+                                            <option value="4" <?php if($row['category_id'] == 4) echo 'selected'; ?>>Intimate Apparel</option>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Size</label>
-                                        <input type="text" class="form-control" name="size" value="<?php echo htmlspecialchars($row['size']); ?>" required>
+                                        <input type="text" class="form-control" name="size" 
+                                               value="<?php echo htmlspecialchars($row['size']); ?>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Current Images</label>

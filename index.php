@@ -91,7 +91,7 @@
         <?php
         // Fetch latest 9 products with their images
         $sql = "SELECT p.*, 
-                GROUP_CONCAT(pi.image_url) as product_images 
+                GROUP_CONCAT(pi.image_url) AS product_images 
                 FROM products p 
                 LEFT JOIN product_images pi ON p.id = pi.product_id 
                 WHERE p.active = 1 
@@ -155,22 +155,45 @@
     </div>
 </div>
 
-<!-- Categories Section -->
+<!-- Categories Section (Using category_id) -->
 <div class="container my-5">
     <h2 class="fw-bold mb-4">Shop by Category</h2>
     <div class="row g-4">
         <?php
-        $categories_query = "SELECT DISTINCT category FROM products WHERE active = 1 LIMIT 4";
+        // We'll create a small map of category_id => category name
+        $category_map = [
+            1 => 'Mens Wear',
+            2 => 'Ladies Wear',
+            3 => 'Kids Wear',
+            4 => 'Intimate Apparel'
+        ];
+
+        // Fetch distinct category_id from products
+        $categories_query = "SELECT DISTINCT category_id 
+                             FROM products 
+                             WHERE active = 1 
+                             AND category_id IN (1,2,3,4) 
+                             LIMIT 4";
         $categories_result = mysqli_query($conn, $categories_query);
-        while ($category = mysqli_fetch_assoc($categories_result)):
+
+        while ($cat = mysqli_fetch_assoc($categories_result)):
+            $cat_id = $cat['category_id'];
+
+            // If category_id is not in the map, skip
+            if (!isset($category_map[$cat_id])) {
+                continue;
+            }
+
+            // Display name
+            $cat_name = $category_map[$cat_id];
         ?>
             <div class="col-md-3">
-                <a href="products.php?category=<?php echo urlencode($category['category']); ?>" 
+                <a href="products.php?category_id=<?php echo urlencode($cat_id); ?>" 
                    class="text-decoration-none">
                     <div class="card category-card border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <h5 class="card-title text-dark mb-0">
-                                <?php echo htmlspecialchars($category['category']); ?>
+                                <?php echo htmlspecialchars($cat_name); ?>
                             </h5>
                         </div>
                     </div>
