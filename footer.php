@@ -1,71 +1,171 @@
-<footer class="bg-light pt-5 pb-4">
-    <div class="container">
-        <div class="row">
-            <!-- Newsletter Subscription -->
-            <div class="col-md-4">
-                <h5 class="fw-bold">BE THE FIRST TO KNOW</h5>
-                <form action="subscribe.php" method="POST" class="d-flex">
-                    <input type="email" name="email" class="form-control" placeholder="Enter your email address..." required>
-                    <button type="submit" class="btn btn-dark ms-2">Sign Up</button>
-                </form>
-            </div>
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.footer {
+    background-color: #fff;
+    padding: 4rem 0;
+    font-family: 'Inter', sans-serif;
+    border-top: 1px solid #eee;
+}
 
-            <!-- Customer Service Links -->
-            <div class="col-md-3 mt-4 mt-md-0">
-                <h5 class="fw-bold">CUSTOMER SERVICE</h5>
-                <ul class="list-unstyled">
-                    <li><a href="contact.php" class="text-dark text-decoration-none">Contact Us</a></li>
-                    <li><a href="delivery.php" class="text-dark text-decoration-none">Delivery</a></li>
-                    <li><a href="returns.php" class="text-dark text-decoration-none">Returns and Exchanges</a></li>
-                    <li><a href="size-guide.php" class="text-dark text-decoration-none">Size Guide</a></li>
-                    <li><a href="privacy.php" class="text-dark text-decoration-none">Privacy Policy</a></li>
-                    <li><a href="shipping.php" class="text-dark text-decoration-none">International Shipping</a></li>
-                    <li><a href="feedback.php" class="text-dark text-decoration-none">Fashionable Feedback</a></li>
-                </ul>
-            </div>
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 4rem;
+}
 
-            <!-- Discover Section -->
-            <div class="col-md-2 mt-4 mt-md-0">
-                <h5 class="fw-bold">DISCOVER</h5>
-                <ul class="list-unstyled">
-                    <li><a href="about.php" class="text-dark text-decoration-none">The Company</a></li>
-                </ul>
-            </div>
+.footer-brand {
+    margin-bottom: 1.5rem;
+}
 
-            <!-- Follow Us on Social Media -->
-            <div class="col-md-3 mt-4 mt-md-0 text-md-end">
-                <h5 class="fw-bold">FOLLOW US ON</h5>
-                <a href="#" class="btn btn-dark btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="btn btn-dark btn-sm rounded-circle"><i class="bi bi-pinterest"></i></a>
-                <a href="#" class="btn btn-dark btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="btn btn-dark btn-sm rounded-circle"><i class="bi bi-envelope"></i></a>
+.footer-brand img {
+    height: 40px;
+    margin-bottom: 1.5rem;
+}
+
+.brand-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.footer-heading {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 1rem;
+}
+
+.footer-links a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #000;
+}
+
+.contact-info {
+    color: #666;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.contact-item i {
+    margin-right: 1rem;
+    color: #333;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+</style>
+</head>
+<body>
+
+<footer class="footer">
+    <div class="footer-container">
+        <!-- Brand Section -->
+        <div class="footer-brand">
+            <img src="images/image.png" alt="Dione Logo">
+            <p class="brand-description">Welcome to Dione, where fashion meets love. Elevate your style with our premium clothing brand, crafted to celebrate the timeless bond of Dione.</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-pinterest"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
             </div>
         </div>
-    </div>
 
-    <!-- Floating Social Media & Rewards Section -->
-    <div class="position-fixed bottom-0 start-0 m-3">
-        <div class="d-flex flex-column align-items-start">
-        <img width="48" height="48" src="https://img.icons8.com/color/48/facebook-new.png" alt="facebook-new"/>            <a href="#" class="mb-2"><img width="48" height="48" src="https://img.icons8.com/fluency/48/instagram-new.png" alt="instagram-new"/></a>
-            <a href="#"><img width="48" height="48" src="https://img.icons8.com/color/48/tiktok--v1.png" alt="tiktok--v1"/></a>
+        <!-- My Account Section -->
+        <div>
+            <h3 class="footer-heading">MY ACCOUNT</h3>
+            <ul class="footer-links">
+                <li><a href="#">Account</a></li>
+                <li><a href="#">Orders</a></li>
+                <li><a href="#">Wishlist</a></li>
+                <li><a href="#">Shopping Cart</a></li>
+            </ul>
         </div>
-    </div>
 
-    <!-- Floating Chat Button -->
-    <div class="position-fixed bottom-0 end-0 m-3">
-        <a href="#" class="btn btn-dark rounded-pill p-3">
-            <i class="bi bi-chat"></i> Chat
-            <span class="badge bg-danger ms-2">1</span>
-        </a>
-    </div>
+        <!-- Pages Section -->
+        <div>
+            <h3 class="footer-heading">PAGES</h3>
+            <ul class="footer-links">
+                <li><a href="#">Size Charts</a></li>
+                <li><a href="#">Order Tracking</a></li>
+                <li><a href="#">Return Policy</a></li>
+                <li><a href="#">About Us</a></li>
+            </ul>
+        </div>
 
-    <!-- Footer Bottom Section -->
-    <div class="text-center p-3 mt-3 bg-dark text-white">
-        © <?php echo date('Y'); ?> E-commerce Site. All rights reserved.
-        <a href="terms.php" class="text-white text-decoration-none ms-3">Terms & Conditions</a> |
-        <a href="privacy.php" class="text-white text-decoration-none">Privacy Policy</a>
+        <!-- Contact Info Section -->
+        <div>
+            <h3 class="footer-heading">CONTACT INFO</h3>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>Dione Clothing, Sri Lanka</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <p>Whatsapp: 0710 99 888 7</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <p>Email: Hello@Dione.Lk</p>
+                </div>
+            </div>
+        </div>
     </div>
 </footer>
 
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<!-- Don't forget to include Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</body>
+</html>

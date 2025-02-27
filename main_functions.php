@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 class Auth {
     private $conn;
@@ -10,27 +12,64 @@ class Auth {
 
     // Check if user is logged in
     public function isLoggedIn() {
-        return isset($_SESSION['user_id']) && isset($_SESSION['role']);
+        return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
     }
 
-    // Check if user is admin
+    // Check if user is admin (type=3)
     public function isAdmin() {
-        return $this->isLoggedIn() && $_SESSION['role'] === 'admin';
+        if (!$this->isLoggedIn()) {
+            return false;
+        }
+        
+        // Get user type from database
+        $user_id = $_SESSION['user_id'];
+        $query = "SELECT type FROM users WHERE id = ? AND active = 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($row = $result->fetch_assoc()) {
+            return intval($row['type']) === 3;  // Admin type is 3
+        }
+        
+        return false;
     }
 
-    // Check if user is a registered user
+    // Check if user is a registered user (type=2)
     public function isRegisteredUser() {
-        return $this->isLoggedIn() && $_SESSION['role'] === 'user';
+        if (!$this->isLoggedIn()) {
+            return false;
+        }
+        
+        // Get user type from database
+        $user_id = $_SESSION['user_id'];
+        $query = "SELECT type FROM users WHERE id = ? AND active = 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($row = $result->fetch_assoc()) {
+            return intval($row['type']) === 2;  // Regular user type is 2
+        }
+        
+        return false;
     }
 
-    // Verify page access permissions
+    // Verify page access permissions - This method runs on every page load
     public function checkPermission($page) {
+        // Get the current page name
+        $currentPage = basename($page);
+        
         $adminPages = [
             'admin_dashboard.php',
-            'add_product.php',
+            'admin_add_product.php',
             'admin_view_products.php',
-            'edit_product.php',
-            'delete_product.php'
+            'admin_edit_product.php',
+            'admin_delete_product.php',
+            'admin_users.php',
+            'admin_orders.php'
         ];
 
         $userPages = [
@@ -41,30 +80,26 @@ class Auth {
             'profile.php'
         ];
 
-        $publicPages = [
-            'index.php',
-            'login.php',
-            'register.php',
-            'product_list.php',
-            'contact.php'
-        ];
-
-        // Get the current page name
-        $currentPage = basename($_SERVER['PHP_SELF']);
-
-        if (in_array($currentPage, $adminPages) && !$this->isAdmin()) {
-            $this->redirectUnauthorized();
+        // Force check for admin pages
+        if (in_array($currentPage, $adminPages)) {
+            // This is the critical security check - verify admin status
+            if (!$this->isAdmin()) {
+                $this->redirectUnauthorized();
+            }
         }
 
-        if (in_array($currentPage, $userPages) && !$this->isLoggedIn()) {
-            $this->redirectLogin();
+        // Force check for user pages
+        if (in_array($currentPage, $userPages)) {
+            if (!$this->isLoggedIn()) {
+                $this->redirectLogin();
+            }
         }
     }
 
     // Redirect unauthorized access
     private function redirectUnauthorized() {
-        $_SESSION['error'] = "You don't have permission to access this page.";
-        header("Location: index.php");
+        $_SESSION['error'] = "Access Denied. Only administrators can access this area.";
+        header("Location: login.php");
         exit();
     }
 
@@ -85,7 +120,7 @@ class Auth {
 
     // Get user details
     public function getUserDetails($user_id) {
-        $query = "SELECT id, username, email, role, created_at FROM users WHERE id = ?";
+        $query = "SELECT id, username, email, type, active, created_at FROM users WHERE id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -94,11 +129,12 @@ class Auth {
     }
 }
 
-// Initialize the Auth class
+// Include the database connection
 require_once 'config.php';
 $auth = new Auth($conn);
 
-// Check permissions for current page
+// IMMEDIATELY check permissions for current page
+// This is crucial - it will redirect unauthorized users right away
 $auth->checkPermission($_SERVER['PHP_SELF']);
 
 // Function to sanitize input

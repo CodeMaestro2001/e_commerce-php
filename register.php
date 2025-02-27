@@ -1,4 +1,7 @@
 <?php
+// Start session at the very beginning of the script
+session_start();
+
 include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -9,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validate password strength (at least 8 chars, 1 uppercase, 1 number)
     if (!preg_match("/^(?=.*[A-Z])(?=.*\d).{8,}$/", $password)) {
         $error = "Password must be at least 8 characters long, contain an uppercase letter, and a number.";
+        $_SESSION['error_message'] = $error; // Store error in session
     }
     
     else {
@@ -24,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($stmt->num_rows > 0) {
             $error = "Username or Email already exists!";
+            $_SESSION['error_message'] = $error; // Store error in session
         } else {
             // Insert new user
             $insertQuery = "INSERT INTO users (username, email, password, role, active) VALUES (?, ?, ?, 'user', 1)";
@@ -31,6 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bind_param("sss", $username, $email, $hashed_password);
             if ($stmt->execute()) {
                 $success = "Account created successfully! Redirecting to login...";
+                $_SESSION['success_message'] = $success; // Store success message in session
+                
+                // Store new user's ID in session
+                $user_id = $conn->insert_id;
+                $_SESSION['user_id'] = $user_id;
+                $_SESSION['username'] = $username;
+                $_SESSION['email'] = $email;
+                $_SESSION['role'] = 'user';
+                
+                // Set a session welcome flag for first-time login
+                $_SESSION['new_registration'] = true;
+                
                 echo "<script>
                         setTimeout(function() {
                             window.location.href = 'login.php';
@@ -38,10 +55,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       </script>";
             } else {
                 $error = "Error: " . $conn->error;
+                $_SESSION['error_message'] = $error; // Store error in session
             }
         }
         $stmt->close();
     }
+}
+
+// Get messages from session if they exist
+if (isset($_SESSION['error_message'])) {
+    $error = $_SESSION['error_message'];
+    unset($_SESSION['error_message']); // Clear after use
+}
+
+if (isset($_SESSION['success_message'])) {
+    $success = $_SESSION['success_message'];
+    unset($_SESSION['success_message']); // Clear after use
 }
 ?>
 

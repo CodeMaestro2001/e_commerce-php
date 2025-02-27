@@ -157,51 +157,69 @@
 
 <!-- Categories Section (Using category_id) -->
 <div class="container my-5">
-    <h2 class="fw-bold mb-4">Shop by Category</h2>
-    <div class="row g-4">
+    <h2 class="fw-bold mb-4 text-center">Shop by Category</h2>
+    
+    <div class="row g-4 justify-content-center">
         <?php
-        // We'll create a small map of category_id => category name
-        $category_map = [
-            1 => 'Mens Wear',
-            2 => 'Ladies Wear',
-            3 => 'Kids Wear',
-            4 => 'Intimate Apparel'
+        // Map category_id to category name and image
+        $category_data = [
+            1 => [
+                'name'  => 'Mens Wear',
+                'image' => 'category_mens.png' // e.g. images/category_mens.png
+            ],
+            2 => [
+                'name'  => 'Ladies Wear',
+                'image' => 'images/ladies.jpg'
+            ],
+            3 => [
+                'name'  => 'Kids Wear',
+                'image' => 'category_kids.png'
+            ],
+            4 => [
+                'name'  => 'Intimate Apparel',
+                'image' => 'category_intimate.png'
+            ],
         ];
 
         // Fetch distinct category_id from products
         $categories_query = "SELECT DISTINCT category_id 
                              FROM products 
                              WHERE active = 1 
-                             AND category_id IN (1,2,3,4) 
+                               AND category_id IN (1,2,3,4) 
                              LIMIT 4";
         $categories_result = mysqli_query($conn, $categories_query);
 
+        // Loop through the category rows returned from the DB
         while ($cat = mysqli_fetch_assoc($categories_result)):
-            $cat_id = $cat['category_id'];
+            $cat_id = (int)$cat['category_id'];
 
-            // If category_id is not in the map, skip
-            if (!isset($category_map[$cat_id])) {
+            // If not in our $category_data map, skip
+            if (!isset($category_data[$cat_id])) {
                 continue;
             }
 
-            // Display name
-            $cat_name = $category_map[$cat_id];
-        ?>
-            <div class="col-md-3">
+            $cat_name  = $category_data[$cat_id]['name'];
+            $cat_image = $category_data[$cat_id]['image'];
+            ?>
+            
+            <div class="col-6 col-md-3 text-center">
                 <a href="products.php?category_id=<?php echo urlencode($cat_id); ?>" 
-                   class="text-decoration-none">
-                    <div class="card category-card border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <h5 class="card-title text-dark mb-0">
-                                <?php echo htmlspecialchars($cat_name); ?>
-                            </h5>
-                        </div>
+                   class="text-decoration-none text-dark">
+                    
+                    <!-- Circle for the category icon -->
+                    <div class="category-circle mx-auto mb-3">
+                        <img src="images/<?php echo htmlspecialchars($cat_image); ?>" 
+                             alt="<?php echo htmlspecialchars($cat_name); ?>">
                     </div>
+                    
+                    <!-- Category Name -->
+                    <h5 class="fw-bold mb-0"><?php echo htmlspecialchars($cat_name); ?></h5>
                 </a>
             </div>
         <?php endwhile; ?>
     </div>
 </div>
+
 
 <!-- Newsletter Section -->
 <div class="container-fluid bg-light py-5 my-5">
@@ -261,6 +279,25 @@
         font-size: 1.5rem;
     }
 }
+
+.category-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    /* or 'cover', if you want the image to fill the circle more aggressively */
+}
+
 </style>
 
 <?php include 'footer.php'; ?>

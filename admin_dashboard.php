@@ -1,23 +1,23 @@
 <?php
+// Start session at the very beginning
 session_start();
 
+// Require the main functions file with database connection
+require_once 'config.php';
 require_once 'main_functions.php';
+
+// Create a new Auth instance
 $auth = new Auth($conn);
-$auth->checkPermission($_SERVER['PHP_SELF']);
 
-// Restrict access to only admins
+// DOUBLE SECURITY - Check again if user is admin
 if (!$auth->isAdmin()) {
-    die("Access Denied. Admins only.");
-}
-
-// Check if the user is logged in
-if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
-    header("Location: index.php");
+    $_SESSION['error'] = "Access Denied. Administrator privileges required.";
+    header("Location: login.php");
     exit();
 }
+
+// Continue only if admin check passed
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,19 +63,24 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
     </style>
 </head>
 <body>
+    <?php
+    // Final security check - only execute the rest if user is admin
+    if ($auth->isAdmin()): 
+    ?>
     <!-- Sidebar -->
     <div class="sidebar">
         <h4 class="text-center mt-3">Admin Panel</h4>
-        <a href="#" class="mt-3"><i class="fas fa-chart-line"></i> Dashboard</a>
-        <a href="#"><i class="fas fa-users"></i> Users</a>
+        <a href="admin_dashboard.php" class="mt-3"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="admin_users.php"><i class="fas fa-users"></i> Users</a>
         <a href="admin_add_product.php"><i class="fas fa-box"></i> Add Products</a>
-        <a href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
-        <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a href="admin_orders.php"><i class="fas fa-shopping-cart"></i> Orders</a>
+        <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
     <!-- Content -->
     <div class="content">
-        <h1 class="mb-4">Welcome, <?php echo $_SESSION['username']; ?>!</h1>
+        <h1 class="mb-4">Welcome, <?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</h1>
+        
         <div class="row">
             <div class="col-md-3">
                 <div class="card text-white bg-primary mb-3">
@@ -123,6 +128,14 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
             </div>
         </div>
     </div>
+    <?php else: ?>
+    <div class="container mt-5">
+        <div class="alert alert-danger">
+            <h3>Access Denied</h3>
+            <p>You do not have permission to view this page. Please <a href="login.php">login</a> with administrator credentials.</p>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
