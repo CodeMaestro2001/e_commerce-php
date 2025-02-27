@@ -180,72 +180,67 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
 
     <!-- Main Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <img src="images/dione_logo.png" alt="Dione Fashion">
-            </a>
-    
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="products.php">Shop</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="new-arrivals.php">New Arrivals</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="sale.php">Sale</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.php">About</a>
-                    </li>
-                </ul>
-                
-                <form class="search-form d-flex">
-                    <input class="form-control" type="search" placeholder="Search products..." aria-label="Search">
-                    <button type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-                
-                <div class="header-icons">
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <!-- User is logged in, show dropdown -->
-                        <div class="user-dropdown">
-                            <a href="javascript:void(0)" class="header-icon">
-                                <i class="fas fa-user"></i>
-                                <span class="ms-1 d-none d-lg-inline"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
-                            </a>
-                            <div class="user-dropdown-content">
-                                <div class="welcome-text">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></div>
-                                <div class="user-dropdown-divider"></div>
-                                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                                    <a class="user-dropdown-item" href="admin_dashboard.php">Admin Dashboard</a>
-                                    <div class="user-dropdown-divider"></div>
-                                <?php else: ?>
-                                    <a class="user-dropdown-item" href="user_dashboard.php">My Account</a>
-                                <?php endif; ?>
-                                <a class="user-dropdown-item" href="orders.php">My Orders</a>
-                                <a class="user-dropdown-item" href="wishlist.php">My Wishlist</a>
-                                <div class="user-dropdown-divider"></div>
-                                <a class="user-dropdown-item" href="logout.php">Logout</a>
-                            </div>
-                        </div>
-                    <?php else: ?>
-                        <!-- User is not logged in, show login link -->
-                        <a href="login.php" class="header-icon">
+    <div class="container">
+        <a class="navbar-brand" href="index.php">
+            <img src="images/dione_logo.png" alt="Dione Fashion">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.php">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="products.php">Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="new-arrivals.php">New Arrivals</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="sale.php">Sale</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.php">About</a>
+                </li>
+            </ul>
+
+            <form class="search-form d-flex">
+                <input class="form-control" type="search" placeholder="Search products..." aria-label="Search">
+                <button type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <div class="header-icons">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <!-- User is logged in, show dropdown -->
+                    <div class="user-dropdown">
+                        <a href="javascript:void(0)" class="header-icon">
                             <i class="fas fa-user"></i>
+                            <span class="ms-1 d-none d-lg-inline"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
                         </a>
-                    <?php endif; ?>
-                    
+                        <div class="user-dropdown-content">
+                            <div class="welcome-text">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></div>
+                            <div class="user-dropdown-divider"></div>
+                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                                <a class="user-dropdown-item" href="admin_dashboard.php">Admin Dashboard</a>
+                                <div class="user-dropdown-divider"></div>
+                            <?php else: ?>
+                                <a class="user-dropdown-item" href="user_dashboard.php">My Account</a>
+                            <?php endif; ?>
+                            <a class="user-dropdown-item" href="orders.php">My Orders</a>
+                            <a class="user-dropdown-item" href="wishlist.php">My Wishlist</a>
+                            <div class="user-dropdown-divider"></div>
+                            <a class="user-dropdown-item" href="logout.php">Logout</a>
+                        </div>
+                    </div>
+
+                    <!-- Show Cart & Wishlist Only for Logged-in Users -->
                     <a href="wishlist.php" class="header-icon">
                         <i class="fas fa-heart"></i>
                     </a>
@@ -253,10 +248,17 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count"><?php echo $cartCount; ?></span>
                     </a>
-                </div>
+
+                <?php else: ?>
+                    <!-- User is not logged in, show login link -->
+                    <a href="login.php" class="header-icon">
+                        <i class="fas fa-user"></i>
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
