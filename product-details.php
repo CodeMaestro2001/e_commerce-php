@@ -137,12 +137,104 @@ $whatsapp_share_url = "https://api.whatsapp.com/send?text={$whatsapp_message}";
             <div class="mb-4">
                 <label class="form-label">Select Size</label>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-dark size-btn">Small</button>
-                    <button class="btn btn-outline-dark size-btn">Medium</button>
-                    <button class="btn btn-outline-dark size-btn">Large</button>
-                    <button class="btn btn-outline-dark size-btn">XL</button>
+                    <button class="btn btn-outline-dark size-btn">UK6</button>
+                    <button class="btn btn-outline-dark size-btn">UK8</button>
+                    <button class="btn btn-outline-dark size-btn">UK10</button>
+                    <button class="btn btn-outline-dark size-btn">UK12</button>
+                    <button class="btn btn-outline-dark size-btn">UK14</button>
+                    <button class="btn btn-outline-dark size-btn">UK16</button>
+
                 </div>
-                <a href="#" class="size-chart-link ms-2">Size Chart</a>
+                <!-- Size Chart Link -->
+            <a href="#" class="size-chart-link ms-2" id="openSizeChart" >Size Chart</a>
+
+            <!-- Modal Structure -->
+            <div id="sizeChartModal" class="modal">
+            <!-- Close Button -->
+            <span class="close" id="closeSizeChart">&times;</span>
+            <!-- Modal Content (Size Chart Image) -->
+            <img src="images/size_chart.jpg" alt="Size Chart" class="modal-image" />
+            </div>
+
+            <style>
+                /* Size Chart link (example styling) */
+                .size-chart-link {
+                text-decoration: none;
+                cursor: pointer;
+                font-weight: 600;
+                border: 1px solid #000;
+                padding: 8px 12px;
+                border-radius: 4px;
+                }
+
+                /* Modal container: hidden by default */
+                .modal {
+                display: none;              /* Hidden by default */
+                position: fixed;            /* Stay in place */
+                z-index: 9999;             /* Sit on top */
+                left: 0;
+                top: 0;
+                width: 100%;               /* Full width */
+                height: 100%;              /* Full height */
+                overflow: auto;            /* Enable scroll if needed */
+                background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+                justify-content: center;
+                align-items: center;
+                }
+
+                /* Modal content (the image) */
+                .modal-image {
+                max-width: 90%;
+                max-height: 80%;
+                margin: auto;
+                display: block;
+                border-radius: 8px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+                }
+
+                /* The Close Button (X) */
+                .close {
+                position: absolute;
+                top: 30px;
+                right: 30px;
+                font-size: 2rem;
+                font-weight: bold;
+                color: #ffffff;
+                cursor: pointer;
+                transition: color 0.3s ease;
+                }
+
+                .close:hover {
+                color: #ccc; 
+                }
+            </style>
+
+        <script>
+        // Grab elements
+        const openButton = document.getElementById('openSizeChart');
+        const modal = document.getElementById('sizeChartModal');
+        const closeButton = document.getElementById('closeSizeChart');
+
+        // Open modal when user clicks "Size Chart" link
+        openButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default link behavior
+            modal.style.display = 'flex'; // Use flex to center content
+        });
+
+        // Close modal when user clicks the "X" button
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Optional: close the modal if user clicks anywhere outside the image
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+            modal.style.display = 'none';
+            }
+        });
+        </script>
+
+
             </div>
 
             <!-- Quantity and Add to Cart -->

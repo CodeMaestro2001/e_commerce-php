@@ -1,237 +1,221 @@
 <?php
-session_start();
-include 'config.php';
+// products.php
 
-// Initialize shopping cart if it doesn't exist
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = array();
+include 'config.php'; // your DB connection, etc.
+// include 'header.php'; // (Optional) if you have a separate header file
+
+// --------------------------------------------
+// 1. Capture Filter Inputs (Category & Size)
+// --------------------------------------------
+$selectedCategory = isset($_GET['category']) ? trim($_GET['category']) : '';
+$selectedSize     = isset($_GET['size'])     ? trim($_GET['size'])     : '';
+
+// --------------------------------------------
+// 2. Build the SQL Query with Optional Filters
+// --------------------------------------------
+// We will join product_stock so we can filter by size (and check stock > 0).
+// If you prefer to show out-of-stock items, remove "AND ps.stock_quantity > 0".
+
+$sql = "
+  SELECT DISTINCT p.id, p.title, p.description, p.price, p.category_id
+  FROM products p
+  LEFT JOIN product_stock ps ON p.id = ps.product_id
+  WHERE p.active = 1
+";
+
+// Filter by category if set
+if (!empty($selectedCategory)) {
+    $sql .= " AND p.category_id = ? ";
 }
 
-// Handle Add to Cart
-if (isset($_POST['add_to_cart'])) {
-    $product_id = $_POST['product_id'];
-    $quantity = $_POST['quantity'] ?? 1;
-    
-    // Check if product already exists in cart
-    if (isset($_SESSION['cart'][$product_id])) {
-        $_SESSION['cart'][$product_id] += $quantity;
-    } else {
-        $_SESSION['cart'][$product_id] = $quantity;
-    }
-    
-    header("Location: products.php?success=added_to_cart");
-    exit();
+// Filter by size if set
+if (!empty($selectedSize)) {
+    $sql .= " AND ps.size = ? AND ps.stock_quantity > 0 ";
 }
 
-// Pagination settings
-$items_per_page = 12;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $items_per_page;
+// Order by newest or any criteria you like
+$sql .= " ORDER BY p.id DESC";
 
-// Get total number of products
-$total_query = "SELECT COUNT(*) as total FROM products WHERE active = 1";
-$total_result = mysqli_query($conn, $total_query);
-$total_row = mysqli_fetch_assoc($total_result);
-$total_products = $total_row['total'];
-$total_pages = ceil($total_products / $items_per_page);
-
-// Get products with pagination
-$sql = "SELECT * FROM products WHERE active = 1 ORDER BY id DESC LIMIT ? OFFSET ?";
+// --------------------------------------------
+// 3. Prepare & Bind the Statement
+// --------------------------------------------
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "ii", $items_per_page, $offset);
+
+if (!empty($selectedCategory) && !empty($selectedSize)) {
+    // Both category and size
+    mysqli_stmt_bind_param($stmt, "is", $selectedCategory, $selectedSize);
+} elseif (!empty($selectedCategory)) {
+    // Only category
+    mysqli_stmt_bind_param($stmt, "i", $selectedCategory);
+} elseif (!empty($selectedSize)) {
+    // Only size
+    mysqli_stmt_bind_param($stmt, "s", $selectedSize);
+}
+
+// --------------------------------------------
+// 4. Execute & Fetch Products
+// --------------------------------------------
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
-// Handle category filter if exists
-//$categories_query = "SELECT DISTINCT category FROM products WHERE active = 1";
-//$categories_result = mysqli_query($conn, $categories_query);
+$products = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $products[] = $row;
+}
+mysqli_stmt_close($stmt);
 
-
-// Handle search if exists
-if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $search = '%' . mysqli_real_escape_string($conn, $_GET['search']) . '%';
-    $sql = "SELECT * FROM products WHERE active = 1 AND (title LIKE ? OR description LIKE ?) ORDER BY id DESC LIMIT ? OFFSET ?";
+// --------------------------------------------
+// 5. Helper: Get Product's Images
+// --------------------------------------------
+function getProductImages($conn, $product_id) {
+    $sql = "SELECT image_url FROM product_images WHERE product_id = ?";
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "ssii", $search, $search, $items_per_page, $offset);
+    mysqli_stmt_bind_param($stmt, "i", $product_id);
     mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $images = [];
+    while ($img = mysqli_fetch_assoc($res)) {
+        $images[] = $img['image_url'];
+    }
+    return $images;
+}
+
+// --------------------------------------------
+// 6. Helper: Map Category IDs to Names
+// --------------------------------------------
+// You may have your own categories. Adjust accordingly.
+// Or, if you have a categories table, fetch them dynamically.
+function getCategoryName($catId) {
+    switch ($catId) {
+        case 1: return 'Dresses';
+        case 2: return 'Tops';
+        case 3: return 'Jeans';
+        case 4: return 'Trousers';
+        case 5: return 'Skirts';
+        case 6: return 'Shorts';
+        // etc. You can expand as you like
+        default: return 'Other';
+    }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Products - E-commerce Store</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <style>
-        .product-card {
-            transition: transform 0.3s ease;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-        .product-image {
-            height: 200px;
-            object-fit: cover;
-        }
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 12px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>All Products</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+  <style>
+    /* Quick side filter + product grid layout */
+    .page-container {
+      display: flex;
+      gap: 2rem;
+    }
+    .filter-sidebar {
+      flex: 0 0 250px;
+    }
+    .product-list {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      transition: box-shadow 0.2s;
+    }
+    .product-card:hover {
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    }
+    .product-card img {
+      max-width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+    .product-card h5 {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+    .product-card p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">E-commerce Store</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="products.php">Products</a>
-                    </li>
-                </ul>
-                <form class="d-flex me-3" action="products.php" method="GET">
-                    <input class="form-control me-2" type="search" name="search" placeholder="Search products..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
-                    <button class="btn btn-outline-light" type="submit">Search</button>
-                </form>
-                <a href="cart.php" class="btn btn-outline-light position-relative">
-                    <i class="bi bi-cart3"></i> Cart
-                    <?php if (!empty($_SESSION['cart'])): ?>
-                        <span class="cart-count"><?php echo array_sum($_SESSION['cart']); ?></span>
-                    <?php endif; ?>
-                </a>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Main Content -->
-    <div class="container mt-4">
-        <?php if (isset($_GET['success']) && $_GET['success'] == 'added_to_cart'): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                Product added to cart successfully!
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        <?php endif; ?>
+<div class="container py-4">
+  <div class="page-container">
+    <!-- ====================================== -->
+    <!--  LEFT SIDEBAR: Categories & Sizes      -->
+    <!-- ====================================== -->
+    <div class="filter-sidebar">
+      <h5>Categories</h5>
+      <ul class="list-unstyled">
+        <!-- Example static links; adapt to your DB as needed -->
+        <li><a href="products.php">All</a></li>
+        <li><a href="products.php?category=1">Dresses</a></li>
+        <li><a href="products.php?category=2">Tops</a></li>
+        <li><a href="products.php?category=3">Jeans</a></li>
+        <li><a href="products.php?category=4">Trousers</a></li>
+        <li><a href="products.php?category=5">Skirts</a></li>
+        <li><a href="products.php?category=6">Shorts</a></li>
+        <!-- Add more as needed -->
+      </ul>
 
-        <!-- Category Filter -->
-       
+      <h5>Size</h5>
+      <ul class="list-unstyled">
+        <!-- Linking to e.g. ?size=UK6, etc. -->
+        <li><a href="products.php?size=UK6">6</a></li>
+        <li><a href="products.php?size=UK8">8</a></li>
+        <li><a href="products.php?size=UK10">10</a></li>
+        <li><a href="products.php?size=UK12">12</a></li>
+        <li><a href="products.php?size=UK14">14</a></li>
+        <li><a href="products.php?size=UK16">16</a></li>
+      </ul>
 
-        <!-- Products Grid -->
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-            <?php while ($product = mysqli_fetch_assoc($result)): ?>
-                <div class="col">
-                    <div class="card h-100 product-card">
-                        <div id="carousel<?php echo $product['id']; ?>" class="carousel slide" data-bs-ride="carousel">
-                            <div class="carousel-inner">
-                                <?php
-                                $images = array_filter([$product['image1'], $product['image2'], $product['image3']]);
-                                foreach ($images as $index => $image):
-                                    if ($image):
-                                ?>
-                                    <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
-                                        <img src="uploads/<?php echo htmlspecialchars($image); ?>" 
-                                             class="d-block w-100 product-image" 
-                                             alt="<?php echo htmlspecialchars($product['title']); ?>">
-                                    </div>
-                                <?php 
-                                    endif;
-                                endforeach; 
-                                ?>
-                            </div>
-                            <?php if (count($images) > 1): ?>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carousel<?php echo $product['id']; ?>" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon"></span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#carousel<?php echo $product['id']; ?>" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon"></span>
-                                </button>
-                            <?php endif; ?>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title"><?php echo htmlspecialchars($product['title']); ?></h5>
-                            <p class="card-text"><?php echo htmlspecialchars(substr($product['description'], 0, 100)) . '...'; ?></p>
-                            <p class="card-text"><strong>Price: $<?php echo number_format($product['price'], 2); ?></strong></p>
-                            <form action="products.php" method="POST" class="d-flex gap-2">
-                                <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
-                                <input type="number" name="quantity" value="1" min="1" max="10" class="form-control form-control-sm w-25">
-                                <button type="submit" name="add_to_cart" class="btn btn-primary">
-                                    <i class="bi bi-cart-plus"></i> Add to Cart
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            <?php endwhile; ?>
-        </div>
-
-        <!-- Pagination -->
-        <?php if ($total_pages > 1): ?>
-            <nav aria-label="Page navigation" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                        <li class="page-item <?php echo $page == $i ? 'active' : ''; ?>">
-                            <a class="page-link" href="?page=<?php echo $i; ?><?php echo isset($_GET['category']) ? '&category=' . urlencode($_GET['category']) : ''; ?><?php echo isset($_GET['search']) ? '&search=' . urlencode($_GET['search']) : ''; ?>">
-                                <?php echo $i; ?>
-                            </a>
-                        </li>
-                    <?php endfor; ?>
-                </ul>
-            </nav>
-        <?php endif; ?>
+      <!-- If you want combined filters, the user can manually 
+           add both, e.g. products.php?category=1&size=UK10 -->
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white mt-5 py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>About Us</h5>
-                    <p>Your trusted source for quality products.</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="index.php" class="text-white">Home</a></li>
-                        <li><a href="products.php" class="text-white">Products</a></li>
-                        <li><a href="cart.php" class="text-white">Cart</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Contact Us</h5>
-                    <p>Email: info@example.com<br>Phone: (123) 456-7890</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <!-- ====================================== -->
+    <!--  MAIN CONTENT: Product Grid           -->
+    <!-- ====================================== -->
+    <div class="product-list">
+      <?php if (count($products) > 0): ?>
+        <?php foreach ($products as $product): ?>
+          <?php 
+             // Get up to 1 or more images
+             $images = getProductImages($conn, $product['id']);
+             $imgSrc = (!empty($images)) 
+                       ? 'uploads/' . $images[0] 
+                       : 'placeholder.jpg'; // fallback image
+          ?>
+          <div class="product-card">
+            <img src="<?php echo htmlspecialchars($imgSrc); ?>" alt="Product Image">
+            <h5><?php echo htmlspecialchars($product['title']); ?></h5>
+            <p><?php echo htmlspecialchars($product['description']); ?></p>
+            <p><strong>$<?php echo number_format($product['price'], 2); ?></strong></p>
+            <p class="text-muted">
+              Category: <?php echo getCategoryName($product['category_id']); ?>
+            </p>
+            <!-- A link to product detail page, if you have one: -->
+            <a class="btn btn-sm btn-primary" href="product_detail.php?id=<?php echo $product['id']; ?>">
+              View Details
+            </a>
+          </div>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <p>No products found for your filter.</p>
+      <?php endif; ?>
+    </div>
+  </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Auto-hide alerts after 5 seconds
-        document.addEventListener('DOMContentLoaded', function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    alert.classList.remove('show');
-                    setTimeout(() => alert.remove(), 150);
-                }, 5000);
-            });
-        });
-    </script>
+<!-- Optional: include 'footer.php' here if you have a separate footer -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
